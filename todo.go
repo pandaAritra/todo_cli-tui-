@@ -3,7 +3,11 @@ package main
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 	"time"
+
+	"github.com/aquasecurity/table"
 )
 
 func (todos *Todos) add(title string) {
@@ -11,21 +15,10 @@ func (todos *Todos) add(title string) {
 		Title:       title,
 		Completed:   false,
 		CreatedAt:   time.Now(),
-		completedAt: nil,
+		CompletedAt: nil,
 	}
 
 	*todos = append(*todos, todo)
-}
-
-func (todos *Todos) listAll() {
-	for i, todo := range *todos {
-		fmt.Printf("%v :is -> %+v ", i, todo.Title)
-		if todo.Completed == true {
-			fmt.Printf("completed at %v", todo.completedAt.Format(time.RFC822))
-		}
-		fmt.Println()
-
-	}
 }
 
 func (todos *Todos) markeAsDone(title string) {
@@ -34,7 +27,7 @@ func (todos *Todos) markeAsDone(title string) {
 		if t[i].Title == title {
 			t[i].Completed = true
 			crrTime := time.Now()
-			t[i].completedAt = &crrTime
+			t[i].CompletedAt = &crrTime
 		}
 	}
 }
@@ -58,4 +51,42 @@ func (todos *Todos) delete(title string) {
 	if !deleted {
 		fmt.Printf("%v was not found \n", title)
 	}
+}
+
+func (todos *Todos) listAll() {
+	for i, todo := range *todos {
+		fmt.Printf("%v :is -> %+v ", i, todo.Title)
+		if todo.Completed == true {
+			fmt.Printf("completed at %v", todo.CompletedAt.Format(time.RFC822))
+		}
+		fmt.Println()
+
+	}
+}
+
+func (todos *Todos) print() {
+	table := table.New(os.Stdout)
+
+	table.SetRowLines(false)
+	table.SetHeaders("#", "Title", "Completed", "Created At", "Completed At")
+
+	for index, t := range *todos {
+		completed := "❌"
+		CompletedAt := ""
+
+		if t.Completed {
+			completed = "✅"
+			if t.CompletedAt != nil {
+				CompletedAt = t.CompletedAt.Format(time.Kitchen)
+
+			}
+
+		}
+
+		table.AddRow(strconv.Itoa(index), t.Title, completed, t.CreatedAt.Format(time.Kitchen), CompletedAt)
+
+	}
+
+	table.Render()
+
 }

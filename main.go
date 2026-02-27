@@ -8,7 +8,7 @@ type Todo struct {
 	Title       string
 	Completed   bool
 	CreatedAt   time.Time
-	completedAt *time.Time
+	CompletedAt *time.Time
 }
 
 type Todos []Todo
@@ -22,6 +22,8 @@ func main() {
 	todos.markeAsDone("drink tea")
 	todos.delete("new function added")
 	todos.listAll()
+
+	todos.print()
 
 	// fmt.Printf("%T \n", strconv.Itoa(56))
 }
